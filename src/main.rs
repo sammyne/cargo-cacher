@@ -14,9 +14,9 @@ extern crate serde;
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
+extern crate humantime;
 extern crate simple_logger;
 extern crate walkdir;
-extern crate humantime;
 
 use std::env;
 use std::path::PathBuf;
@@ -126,7 +126,7 @@ impl Config {
                     .short("e")
                     .required(false)
                     .takes_value(true)
-                    .help("Externally reachable URL (Default: http://localhost:8080)")
+                    .help("Externally reachable URL (Default: http://localhost:8080)"),
             )
             .arg(
                 Arg::with_name("refresh")
@@ -172,10 +172,9 @@ impl Config {
         crate_path.push_str("/crates");
         let mut git_index: String = index_path.clone();
         git_index.push_str("/index");
-        let port = u16::from_str(matches.value_of("port")
-                    .unwrap_or("8080"))
-                .unwrap_or(8080);
-        let refresh_interval_human = matches.value_of("refresh")
+        let port = u16::from_str(matches.value_of("port").unwrap_or("8080")).unwrap_or(8080);
+        let refresh_interval_human = matches
+            .value_of("refresh")
             .unwrap_or("10 minutes")
             .parse::<humantime::Duration>();
         let refresh_interval_seconds = u64::from_str(matches.value_of("refresh").unwrap_or("600"));
@@ -203,9 +202,10 @@ impl Config {
                 .unwrap_or("https://github.com/rust-lang/crates.io-index.git")
                 .into(),
             port: u16::from_str(matches.value_of("port").unwrap_or("8080")).unwrap_or(8080),
-            extern_url: matches.value_of("extern-url")
+            extern_url: matches
+                .value_of("extern-url")
                 .map(Into::into)
-                .unwrap_or(format!("http://localhost:{}", port)),
+                .unwrap_or(format!("http://0.0.0.0:{}", port)),
             refresh_interval: refresh_interval,
             threads: u32::from_str(matches.value_of("threads").unwrap_or("16")).unwrap_or(16),
             log_level: log_level,
